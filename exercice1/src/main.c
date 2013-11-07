@@ -1,4 +1,5 @@
 #include "common.h"
+#include "temps.h"
 
 static inline comptes_t bilan (const pthread_t * acteurs, int nombre_acteurs)
 {
@@ -8,16 +9,17 @@ static inline comptes_t bilan (const pthread_t * acteurs, int nombre_acteurs)
 
     for (int i = 0; i < nombre_acteurs; i++)
     {
-        comptes_t * res;
-        pthread_join(acteurs[i], (void **) &res);
-        resultat.nombre += res->nombre;
-        resultat.somme += res->somme;
+        comptes_t * c;
+        pthread_join(acteurs[i], (void **) &c);
+        resultat.nombre += c->nombre;
+        resultat.somme += c->somme;
+        free(c);
     }
 
     return resultat;
 }
 
-static inline infos_t * creer_infos(tampon_t * tampon, sem_t * semaphore)
+static inline infos_t * creer_infos(tampon_t * tampon, sem_t * semaphore, unsigned int numero)
 {
     infos_t * i = malloc(sizeof *i);
 
@@ -25,7 +27,8 @@ static inline infos_t * creer_infos(tampon_t * tampon, sem_t * semaphore)
         pq_error("malloc", EX_OSERR);
 
     i->tampon = tampon;
-    i->semaphore;
+    i->semaphore = semaphore;
+    i->numero = numero;
 
     return i;
 }
@@ -67,57 +70,45 @@ static inline comptes_t * creer_comptes()
     return c;
 }
 
-void * consommation(void * arg)
+static int ecrire_entier(tampon_t * tampon, unsigned int * numero, comptes_t * comptes)
 {
-    comptes_t * c = creer_comptes();
-
-    tampon_t * t = (tampon_t *) arg;
-
-    pthread_exit(c);
-}
-
-static int ecrire_entier(tampon_t * tampon, int * numero, comptes_t * comptes)
-{
-    int suivant;
-    const int taille = TAILLE_TAMPON;
-    int * debut = &tampon->curseur;
-    int * fin = &tampon->suivant;
+    int debut = tampon->suivant;
+    int fin = tampon->curseur;
     int * tab = tampon->valeurs;
 
-    if (*fin >= taille)
-        return TAMPON_REMPLI;
-
-    int valeur;
     if (est_ce_la_fin_des_temps())
-        valeur = FIN_PRODUCTION;
-    else
-        valeur = nombre_aleatoire(numero);
+    {
+        tab[debut] = FIN_PRODUCTION;
+        return FIN_PRODUCTION;
+    }
 
-    tab[*fin] = valeur;
-    suivant = (*fin + 1) % taille;
-    if (suivant != *debut)
-        *fin = suivant;
-    else
-        *fin += taille;
-
-    return valeur == FIN_PRODUCTION ? FIN_PRODUCTION : 0;
-}
-
-static int lire_entier(tampon_t * tampon)
-{
-    int entier;
-    const int taille = TAILLE_TAMPON;
-    int * debut = &tampon->curseur;
-    int * fin = &tampon->suivant;
-    int * tab = tampon->valeurs;
-
-    if (*debut == *fin)
+    if (fin >= TAILLE_TAMPON)
         return TAMPON_REMPLI;
 
-    entier = tab[*debut];
-    *debut = (*debut + 1) % taille;
-    if (*fin >= taille)
-        *fin -= taille;
+    int valeur = nombre_aleatoire(numero);
+    tab[fin] = valeur;
+    int suivant = (fin + 1) % TAILLE_TAMPON;
+    tampon->curseur = (suivant != debut) ? suivant : (suivant + TAILLE_TAMPON);
+    comptes->nombre++;
+    comptes->somme += valeur;
+    printf("Ecriture : %d\n", valeur);
+
+    return 0;
+}
+
+static int lire_entier(tampon_t * tampon, comptes_t * comptes)
+{
+    int debut = tampon->suivant;
+    int fin = tampon->curseur;
+    int * tab = tampon->valeurs;
+
+    if (debut == fin)
+        return TAMPON_VIDE;
+
+    int entier = tab[debut];
+    tampon->suivant = (debut + 1) % TAILLE_TAMPON;
+    if (fin >= TAILLE_TAMPON)
+        tampon->curseur -= TAILLE_TAMPON;
 
     return entier;
 }
@@ -127,11 +118,41 @@ void * production(void * arg)
     infos_t * i = (infos_t *) arg;
     comptes_t * c = creer_comptes();
     int fin = 0;
+    masquer_signal(SIGINT);
 
     while (fin != FIN_PRODUCTION)
     {
-        fin = ecrire_entier(i->tampon, i->numero, c);
+        sem_wait(i->semaphore);
+        fin = ecrire_entier(i->tampon, &i->numero, c);
+        sem_post(i->semaphore);
     }
+
+    free(arg);
+
+    pthread_exit(c);
+}
+
+void * consommation(void * arg)
+{
+    infos_t * i = (infos_t *) arg;
+    comptes_t * c = creer_comptes();
+    int lecture = 0;
+    masquer_signal(SIGINT);
+
+    while (lecture != FIN_PRODUCTION)
+    {
+        sem_wait(i->semaphore);
+        lecture = lire_entier(i->tampon, c);
+        sem_post(i->semaphore);
+
+        if (lecture != TAMPON_VIDE && lecture != FIN_PRODUCTION)
+        {
+            c->nombre++;
+            c->somme += lecture;
+            printf("Lecture : %d\n", lecture);
+        }
+    }
+    free(arg);
 
     pthread_exit(c);
 }
@@ -140,8 +161,7 @@ void creer_acteurs(pthread_t * acteurs, void * (*fonction) (void *), tampon_t * 
 {
     for (int i = 0 ; i < nombre; i++)
     {
-        infos_t * infos = creer_infos(tampon, semaphore);
-        *infos->numero = i;
+        infos_t * infos = creer_infos(tampon, semaphore, i);
         int erreur = pthread_create(&acteurs[i], NULL, fonction, (void *) infos);
         if (erreur != 0)
             pq_error("pthread_create", EX_OSERR);
@@ -151,6 +171,7 @@ void creer_acteurs(pthread_t * acteurs, void * (*fonction) (void *), tampon_t * 
 void handler_sigint(int signum)
 {
     cest_la_fin_des_temps();
+    printf("%d\n", _fin_des_temps);
 }
 
 int main(int argc, char ** argv)
@@ -164,6 +185,14 @@ int main(int argc, char ** argv)
     int nombre_producteurs = atoi(argv[1]);
     int nombre_consommateurs = atoi(argv[2]);
 
+    if (nombre_producteurs <= 0 || nombre_consommateurs < 0)
+    {
+        fprintf(stderr, "Usage: %s <producteurs> <consommateurs>\n"
+                "producteurs > 0; consommateurs >= 0\n",
+                argv[0]);
+        exit(EX_DATAERR);
+    }
+
     tampon_t * tampon = creer_tampon();
     sem_t * semaphore = creer_semaphore();
 
@@ -172,6 +201,8 @@ int main(int argc, char ** argv)
     /* Tableaux à taille variable, C99 powa. */
     pthread_t producteurs[nombre_producteurs];
     pthread_t consommateurs[nombre_consommateurs];
+
+    init_fin_des_temps();
 
     creer_acteurs(producteurs, production, tampon, semaphore, nombre_producteurs);
     creer_acteurs(consommateurs, consommation, tampon, semaphore, nombre_consommateurs);
@@ -183,6 +214,10 @@ int main(int argc, char ** argv)
             "Nombre de valeurs consommées : %d\n\tSomme des valeurs consommées : %d\n",
             comptes_production.nombre, comptes_production.somme,
             comptes_consommation.nombre, comptes_consommation.somme);
+
+    free(tampon);
+    sem_destroy(semaphore);
+    free(semaphore);
 
     return 0;
 }

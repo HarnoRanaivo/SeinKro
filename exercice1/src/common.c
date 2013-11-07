@@ -24,7 +24,7 @@ void config_handler(int signum, void (*handler)(int))
         pq_error("sigaction", EX_OSERR);
 }
 
-int nombre_aleatoire(int * graine)
+int nombre_aleatoire(unsigned int * graine)
 {
     return ((double) rand_r(graine) / RAND_MAX) * 255;
 }

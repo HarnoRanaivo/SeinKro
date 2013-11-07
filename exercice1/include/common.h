@@ -9,28 +9,14 @@
 #include <semaphore.h>
 
 #define TAILLE_TAMPON 10
-#define TAMPON_REMPLI -2
 #define FIN_PRODUCTION -1
-
-/* 1 : fin, les producteurs enverront -1. */
-int fin_des_temps = 0;
-
-static inline int est_ce_la_fin_des_temps()
-{
-    return fin_des_temps == 1;
-}
-
-static inline void cest_la_fin_des_temps()
-{
-    fin_des_temps = 1;
-}
-
-typedef unsigned int nat;
+#define TAMPON_REMPLI -2
+#define TAMPON_VIDE -3
 
 typedef struct comptes_t
 {
-    nat nombre;
-    nat somme;
+    unsigned int nombre;
+    unsigned int somme;
 } comptes_t;
 
 typedef struct tampon_t
@@ -44,7 +30,7 @@ typedef struct infos_t
 {
     tampon_t * tampon;
     sem_t * semaphore;
-    int * numero;
+    unsigned int numero;
 } infos_t;
 
 static inline void pq_error(const char * message, int exit_code)
@@ -55,8 +41,8 @@ static inline void pq_error(const char * message, int exit_code)
 
 void masquer_signal(int signum);
 
-void config_handler(int signum, void (*handler)(int));
+void config_handler(int signum, void (* handler) (int));
 
-int nombre_aleatoire(int * graine);
+int nombre_aleatoire(unsigned int * graine);
 
 #endif /* __COMMON_H */

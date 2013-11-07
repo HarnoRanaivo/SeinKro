@@ -11,19 +11,14 @@ vpath %.c $(SPATH)/
 vpath %.h $(IPATH)/
 vpath %.o $(OPATH)/
 
-all: consommateur producteur
+main : main.o common.o | bin
+	$(CC) $(CFLAGS) -o $(BPATH)/$@ $(OPATH)/main.o $(OPATH)/common.o
 
 %.o : %.c | obj
 	gcc $(CFLAGS) -o $(OPATH)/$@ -c $< $(IFLAGS)
 
-consommateur.o : consommateur.c
-producteur.o : producteur.c
-
-consommateur : consommateur.o | bin
-	$(CC) $(CFLAGS) -o $(BPATH)/$@ $(OPATH)/consommateur.o
-
-producteur : producteur.o | bin
-	$(CC) $(CFLAGS) -o $(BPATH)/$@ $(OPATH)/producteur.o
+common.o : common.c common.h
+main.o : main.c common.h temps.h societe.h
 
 obj :
 	@mkdir -p $(OPATH)
