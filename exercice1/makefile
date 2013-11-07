@@ -11,13 +11,14 @@ vpath %.c $(SPATH)/
 vpath %.h $(IPATH)/
 vpath %.o $(OPATH)/
 
-main : main.o common.o | bin
-	$(CC) $(CFLAGS) -o $(BPATH)/$@ $(OPATH)/main.o $(OPATH)/common.o
+main : main.o common.o societe.o | bin
+	$(CC) $(CFLAGS) -o $(BPATH)/$@ $(OPATH)/main.o $(OPATH)/common.o $(OPATH)/societe.o
 
 %.o : %.c | obj
 	gcc $(CFLAGS) -o $(OPATH)/$@ -c $< $(IFLAGS)
 
-common.o : common.c common.h
+societe.o : societe.c societe.h common.h temps.h
+common.o : common.c common.h temps.h
 main.o : main.c common.h temps.h
 
 obj :

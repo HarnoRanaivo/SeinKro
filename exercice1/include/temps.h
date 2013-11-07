@@ -16,12 +16,9 @@ static inline void init_fin_des_temps(findestemps * t)
 
 static inline int est_ce_la_fin_des_temps(findestemps * t)
 {
-    printf("Est-ce ?\n");
     sem_wait(&t->_semaphore_des_temps);
     int temps = t->_fin_des_temps;
-    printf("Est-ce 2?\n");
     sem_post(&t->_semaphore_des_temps);
-    printf("Est-ce 3?\n");
     return temps == 1;
 }
 
@@ -30,7 +27,6 @@ static inline void cest_la_fin_des_temps(findestemps * t)
     sem_wait(&t->_semaphore_des_temps);
     t->_fin_des_temps = 1;
     sem_post(&t->_semaphore_des_temps);
-    printf("C'est.\n");
 }
 
 #endif /* __TEMPS_H */
