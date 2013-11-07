@@ -10,32 +10,12 @@
 
 #include "temps.h"
 
-#define TAILLE_TAMPON 10
-#define FIN_PRODUCTION -1
-#define TAMPON_REMPLI -2
-#define TAMPON_VIDE -3
 
 typedef struct comptes_t
 {
     unsigned long long int nombre;
     unsigned long long int somme;
 } comptes_t;
-
-typedef struct tampon_t
-{
-    int valeurs[TAILLE_TAMPON];
-    int curseur;
-    int suivant;
-    sem_t * semaphore;
-} tampon_t;
-
-typedef struct infos_t
-{
-    tampon_t * tampon;
-    sem_t * semaphore_acteurs;
-    findestemps * temps;
-    unsigned int numero;
-} infos_t;
 
 typedef struct acteurs_t
 {
@@ -56,21 +36,6 @@ void config_handler(int signum, void (* handler) (int));
 
 int nombre_aleatoire(unsigned int * graine);
 
-static inline infos_t * creer_infos(tampon_t * tampon, sem_t * semaphore_acteurs, findestemps * temps, unsigned int numero)
-{
-    infos_t * i = malloc(sizeof *i);
-
-    if (i == NULL)
-        pq_error("malloc", EX_OSERR);
-
-    i->tampon = tampon;
-    i->semaphore_acteurs = semaphore_acteurs;
-    i->temps = temps;
-    i->numero = numero;
-
-    return i;
-}
-
 static inline sem_t * creer_semaphore(int valeur)
 {
     sem_t * s = malloc(sizeof *s);
@@ -84,17 +49,14 @@ static inline sem_t * creer_semaphore(int valeur)
     return s;
 }
 
-static inline tampon_t * creer_tampon()
+static inline void detruire_semaphore(sem_t * semaphore)
 {
-    tampon_t * t = malloc(sizeof *t);
-    if (t == NULL)
-        pq_error("malloc", EX_OSERR);
+    int erreur = sem_destroy(semaphore);
 
-    t->curseur = 0;
-    t->suivant = 0;
-    t->semaphore = creer_semaphore(1);
+    if (erreur != 0)
+        pq_error("sem_destroy", EX_OSERR);
 
-    return t;
+    free(semaphore);
 }
 
 static inline comptes_t * creer_comptes()

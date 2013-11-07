@@ -1,6 +1,7 @@
 #include "common.h"
 #include "temps.h"
 #include "societe.h"
+#include "tampon.h"
 
 static findestemps temps;
 
@@ -82,9 +83,7 @@ int main(int argc, char ** argv)
             comptes_production.nombre, comptes_production.somme,
             comptes_consommation.nombre, comptes_consommation.somme);
 
-    sem_destroy(tampon->semaphore);
-    free(tampon->semaphore);
-    free(tampon);
+    detruire_tampon(tampon);
     sem_destroy(consommateurs.semaphore);
     free(consommateurs.semaphore);
     sem_destroy(producteurs.semaphore);

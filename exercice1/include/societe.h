@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "temps.h"
+#include "tampon.h"
 
 void * production(void * arg);
 
