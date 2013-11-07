@@ -55,11 +55,11 @@ void * production(void * arg)
 
     while (fin != FIN_PRODUCTION)
     {
-        sem_wait(i->semaphore_tampon);
+        sem_wait(i->tampon->semaphore);
         sem_wait(i->semaphore_acteurs);
         fin = ecrire_entier(i->tampon, &i->numero, c, i->temps);
         sem_post(i->semaphore_acteurs);
-        sem_post(i->semaphore_tampon);
+        sem_post(i->tampon->semaphore);
     }
 
     free(arg);
@@ -75,11 +75,11 @@ void * consommation(void * arg)
 
     while (lecture != FIN_PRODUCTION)
     {
-        sem_wait(i->semaphore_tampon);
+        sem_wait(i->tampon->semaphore);
         sem_wait(i->semaphore_acteurs);
         lecture = lire_entier(i->tampon, c);
         sem_post(i->semaphore_acteurs);
-        sem_post(i->semaphore_tampon);
+        sem_post(i->tampon->semaphore);
     }
     free(arg);
 

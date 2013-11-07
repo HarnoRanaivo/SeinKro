@@ -17,8 +17,8 @@
 
 typedef struct comptes_t
 {
-    unsigned int nombre;
-    unsigned int somme;
+    unsigned long long int nombre;
+    unsigned long long int somme;
 } comptes_t;
 
 typedef struct tampon_t
@@ -26,16 +26,23 @@ typedef struct tampon_t
     int valeurs[TAILLE_TAMPON];
     int curseur;
     int suivant;
+    sem_t * semaphore;
 } tampon_t;
 
 typedef struct infos_t
 {
     tampon_t * tampon;
-    sem_t * semaphore_tampon;
     sem_t * semaphore_acteurs;
     findestemps * temps;
     unsigned int numero;
 } infos_t;
+
+typedef struct acteurs_t
+{
+    pthread_t * acteurs;
+    const int nombre;
+    sem_t * semaphore;
+} acteurs_t;
 
 static inline void pq_error(const char * message, int exit_code)
 {
@@ -49,7 +56,7 @@ void config_handler(int signum, void (* handler) (int));
 
 int nombre_aleatoire(unsigned int * graine);
 
-static inline infos_t * creer_infos(tampon_t * tampon, sem_t * semaphore_tampon, sem_t * semaphore_acteurs, findestemps * temps, unsigned int numero)
+static inline infos_t * creer_infos(tampon_t * tampon, sem_t * semaphore_acteurs, findestemps * temps, unsigned int numero)
 {
     infos_t * i = malloc(sizeof *i);
 
@@ -57,7 +64,6 @@ static inline infos_t * creer_infos(tampon_t * tampon, sem_t * semaphore_tampon,
         pq_error("malloc", EX_OSERR);
 
     i->tampon = tampon;
-    i->semaphore_tampon = semaphore_tampon;
     i->semaphore_acteurs = semaphore_acteurs;
     i->temps = temps;
     i->numero = numero;
@@ -86,6 +92,7 @@ static inline tampon_t * creer_tampon()
 
     t->curseur = 0;
     t->suivant = 0;
+    t->semaphore = creer_semaphore(1);
 
     return t;
 }
