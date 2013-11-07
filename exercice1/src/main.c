@@ -78,8 +78,10 @@ int main(int argc, char ** argv)
     comptes_t comptes_production = bilan(&producteurs);
     comptes_t comptes_consommation = bilan(&consommateurs);
 
-    printf("Bilan:\n\tNombre de valeurs produites : %llu\n\tSomme des valeurs produites : %llu\n\t"
-            "Nombre de valeurs consommées : %llu\n\tSomme des valeurs consommées : %llu\n",
+    printf("Bilan:\n\tNombre de valeurs produites : %llu\n"
+            "\tSomme des valeurs produites : %llu\n"
+            "\tNombre de valeurs consommées : %llu\n"
+            "\tSomme des valeurs consommées : %llu\n",
             comptes_production.nombre, comptes_production.somme,
             comptes_consommation.nombre, comptes_consommation.somme);
 

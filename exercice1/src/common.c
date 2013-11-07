@@ -24,7 +24,37 @@ void config_handler(int signum, void (*handler)(int))
         pq_error("sigaction", EX_OSERR);
 }
 
-int nombre_aleatoire(unsigned int * graine)
+sem_t * creer_semaphore(int valeur)
 {
-    return ((double) rand_r(graine) / RAND_MAX) * 255;
+    sem_t * s = malloc(sizeof *s);
+    if (s == NULL)
+        pq_error("malloc", EX_OSERR);
+
+    int erreur = sem_init(s, 0, valeur);
+    if (erreur != 0)
+        pq_error("sem_init", EX_OSERR);
+
+    return s;
+}
+
+void detruire_semaphore(sem_t * semaphore)
+{
+    int erreur = sem_destroy(semaphore);
+
+    if (erreur != 0)
+        pq_error("sem_destroy", EX_OSERR);
+
+    free(semaphore);
+}
+
+comptes_t * creer_comptes()
+{
+    comptes_t * c = malloc(sizeof *c);
+    if (c == NULL)
+        pq_error("malloc", EX_OSERR);
+
+    c->nombre = 0;
+    c->somme = 0;
+
+    return c;
 }

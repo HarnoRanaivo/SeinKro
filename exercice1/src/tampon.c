@@ -19,11 +19,28 @@ void detruire_tampon(tampon_t * tampon)
     free(tampon);
 }
 
-void fin_production(tampon_t * tampon)
+int lire_entier(tampon_t * tampon)
 {
     sem_wait(tampon->semaphore);
-    tampon->valeurs[tampon->suivant] = FIN_PRODUCTION;
+
+    int debut = tampon->suivant;
+    int fin = tampon->curseur;
+    int valeur = tampon->valeurs[debut];
+
+    if (valeur != FIN_PRODUCTION)
+    {
+        if (debut == fin)
+            valeur = TAMPON_VIDE;
+        else
+        {
+            tampon->suivant = (debut + 1) % TAILLE_TAMPON;
+            tampon->curseur = (fin >= TAILLE_TAMPON) ? (fin - TAILLE_TAMPON) : fin;
+        }
+    }
+
     sem_post(tampon->semaphore);
+
+    return valeur;
 }
 
 int ecrire_entier(tampon_t * tampon, int valeur)
@@ -31,49 +48,27 @@ int ecrire_entier(tampon_t * tampon, int valeur)
     sem_wait(tampon->semaphore);
 
     int fin = tampon->curseur;
+    int retour = 0;
 
-    if (fin >= TAILLE_TAMPON)
+    if (fin < TAILLE_TAMPON)
     {
-        sem_post(tampon->semaphore);
-        return TAMPON_REMPLI;
+        int debut = tampon->suivant;
+        int suivant = (fin + 1) % TAILLE_TAMPON;
+
+        tampon->valeurs[fin] = valeur;
+        tampon->curseur = (suivant != debut) ? suivant : (suivant + TAILLE_TAMPON);
     }
-
-    int debut = tampon->suivant;
-
-    tampon->valeurs[fin] = valeur;
-    int suivant = (fin + 1) % TAILLE_TAMPON;
-    tampon->curseur = (suivant != debut) ? suivant : (suivant + TAILLE_TAMPON);
+    else
+        retour = TAMPON_REMPLI;
 
     sem_post(tampon->semaphore);
 
-    return 0;
+    return retour;
 }
 
-int lire_entier(tampon_t * tampon)
+void fin_production(tampon_t * tampon)
 {
     sem_wait(tampon->semaphore);
-
-    int debut = tampon->suivant;
-    int valeur = tampon->valeurs[debut];
-
-    if (valeur == FIN_PRODUCTION)
-    {
-        sem_post(tampon->semaphore);
-        return FIN_PRODUCTION;
-    }
-
-    int fin = tampon->curseur;
-
-    if (debut == fin)
-    {
-        sem_post(tampon->semaphore);
-        return TAMPON_VIDE;
-    }
-
-    tampon->suivant = (debut + 1) % TAILLE_TAMPON;
-    tampon->curseur = (fin >= TAILLE_TAMPON) ? (fin - TAILLE_TAMPON) : fin;
-
+    tampon->valeurs[tampon->suivant] = FIN_PRODUCTION;
     sem_post(tampon->semaphore);
-
-    return valeur;
 }

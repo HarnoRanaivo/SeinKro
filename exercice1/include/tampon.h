@@ -14,8 +14,6 @@ typedef struct tampon_t
 {
     int curseur;
     int suivant;
-    sem_t * occupes;
-    sem_t * libres;
     sem_t * semaphore;
     int valeurs[TAILLE_TAMPON];
 } tampon_t;
@@ -23,9 +21,12 @@ typedef struct tampon_t
 tampon_t * creer_tampon();
 
 void detruire_tampon(tampon_t * tampon);
-int ecrire_entier(tampon_t * tampon, int valeur);
-void fin_production(tampon_t * tampon);
+
 int lire_entier(tampon_t * tampon);
+
+int ecrire_entier(tampon_t * tampon, int valeur);
+
+void fin_production(tampon_t * tampon);
 
 typedef struct infos_t
 {

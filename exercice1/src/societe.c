@@ -14,7 +14,6 @@ void * production(void * arg)
         {
             comptes->nombre++;
             comptes->somme += valeur;
-            printf("Ecriture: %d\n", valeur);
         }
         sem_post(i->semaphore_acteurs);
     }
@@ -39,7 +38,6 @@ void * consommation(void * arg)
         {
             comptes->nombre++;
             comptes->somme += lecture;
-            printf("Lecture: %d\n", lecture);
         }
         sem_post(i->semaphore_acteurs);
     }
