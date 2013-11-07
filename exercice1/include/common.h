@@ -8,6 +8,8 @@
 #include <signal.h>
 #include <semaphore.h>
 
+#include "temps.h"
+
 #define TAILLE_TAMPON 10
 #define FIN_PRODUCTION -1
 #define TAMPON_REMPLI -2
@@ -29,7 +31,9 @@ typedef struct tampon_t
 typedef struct infos_t
 {
     tampon_t * tampon;
-    sem_t * semaphore;
+    sem_t * semaphore_tampon;
+    sem_t * semaphore_acteurs;
+    findestemps * temps;
     unsigned int numero;
 } infos_t;
 

@@ -18,7 +18,7 @@ main : main.o common.o | bin
 	gcc $(CFLAGS) -o $(OPATH)/$@ -c $< $(IFLAGS)
 
 common.o : common.c common.h
-main.o : main.c common.h temps.h societe.h
+main.o : main.c common.h temps.h
 
 obj :
 	@mkdir -p $(OPATH)
