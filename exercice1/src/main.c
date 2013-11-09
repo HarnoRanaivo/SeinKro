@@ -4,32 +4,38 @@
 #include "tampon.h"
 
 static limite_t * limite;
-void handler_sigint(int signum)
+
+static void handler_sigint(int signum)
 {
     printf("\n");
     fin_des_temps(limite);
 }
 
-int main(int argc, char ** argv)
+static void verifier_arguments(int argc, char ** argv)
 {
-    if (argc != 3)
+    if (argc != 3 && argc != 4)
     {
-        fprintf(stderr, "Usage: %s <producteurs> <consommateurs>", argv[0]);
+        fprintf(stderr, "Usage: %s <producteurs> <consommateurs> [taille tampon]", argv[0]);
         exit(EX_USAGE);
     }
-
-    const int nombre_producteurs = atoi(argv[1]);
-    const int nombre_consommateurs = atoi(argv[2]);
-
-    if (nombre_producteurs <= 0 || nombre_consommateurs < 0)
+    else if (atoi(argv[1]) <= 0 || atoi(argv[2]) < 0 || (argc == 4 && atoi(argv[3]) < 1))
     {
-        fprintf(stderr, "Usage: %s <producteurs> <consommateurs>\n"
-                "producteurs > 0; consommateurs >= 0\n",
+        fprintf(stderr, "Usage: %s <producteurs> <consommateurs> [taille tampon]\n"
+                "producteurs > 0; consommateurs >= 0; taille tampon > 0\n",
                 argv[0]);
         exit(EX_DATAERR);
     }
+}
 
-    tampon_t * tampon = creer_tampon();
+int main(int argc, char ** argv)
+{
+    verifier_arguments(argc, argv);
+
+    const int nombre_producteurs = atoi(argv[1]);
+    const int nombre_consommateurs = atoi(argv[2]);
+    const int taille_tampon = (argc != 4) ? TAILLE_TAMPON_DEFAUT : atoi(argv[3]);
+
+    tampon_t * tampon = creer_tampon(taille_tampon);
 
     /* À faire avant le changement du handler de SIGINT ! */
     limite = creer_limite();

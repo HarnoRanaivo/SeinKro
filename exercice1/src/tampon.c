@@ -4,22 +4,33 @@
  */
 #include "tampon.h"
 
-tampon_t * creer_tampon()
+tampon_t * creer_tampon(int taille)
 {
-    tampon_t * t = malloc(sizeof *t);
-    if (t == NULL)
+    tampon_t * tampon = malloc(sizeof *tampon);
+    if (tampon == NULL)
         aq_erreur("malloc", EX_OSERR);
 
-    t->curseur = 0;
-    t->suivant = 0;
-    t->semaphore = creer_semaphore(1);
+    if (taille <= 0)
+        taille = TAILLE_TAMPON_DEFAUT;
 
-    return t;
+    tampon->valeurs = malloc(taille * sizeof *tampon->valeurs);
+    if (tampon->valeurs == NULL)
+        aq_erreur("malloc", EX_OSERR);
+
+    int * t = (int *) &tampon->taille;
+    *t = taille;
+
+    tampon->curseur = 0;
+    tampon->suivant = 0;
+    tampon->semaphore = creer_semaphore(1);
+
+    return tampon;
 }
 
 tampon_t * detruire_tampon(tampon_t * tampon)
 {
     detruire_semaphore(tampon->semaphore);
+    free(tampon->valeurs);
     free(tampon);
     return NULL;
 }
@@ -31,6 +42,7 @@ int lire_entier(tampon_t * tampon)
     int debut = tampon->suivant;
     int fin = tampon->curseur;
     int valeur = tampon->valeurs[debut];
+    const int taille = tampon->taille;
 
     if (valeur != FIN_PRODUCTION)
     {
@@ -38,8 +50,8 @@ int lire_entier(tampon_t * tampon)
             valeur = TAMPON_VIDE;
         else
         {
-            tampon->suivant = (debut + 1) % TAILLE_TAMPON;
-            tampon->curseur = (fin >= TAILLE_TAMPON) ? (fin - TAILLE_TAMPON) : fin;
+            tampon->suivant = (debut + 1) % taille;
+            tampon->curseur = (fin >= taille) ? (fin - taille) : fin;
         }
     }
 
@@ -54,14 +66,15 @@ int ecrire_entier(tampon_t * tampon, int valeur)
 
     int fin = tampon->curseur;
     int retour = 0;
+    const int taille = tampon->taille;
 
-    if (fin < TAILLE_TAMPON)
+    if (fin < taille)
     {
         int debut = tampon->suivant;
-        int suivant = (fin + 1) % TAILLE_TAMPON;
+        int suivant = (fin + 1) % taille;
 
         tampon->valeurs[fin] = valeur;
-        tampon->curseur = (suivant != debut) ? suivant : (suivant + TAILLE_TAMPON);
+        tampon->curseur = (suivant != debut) ? suivant : (suivant + taille);
     }
     else
         retour = TAMPON_REMPLI;

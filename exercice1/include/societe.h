@@ -35,7 +35,7 @@ typedef struct infos_t
 {
     tampon_t * tampon;              /**<- Tampon utilisé. */
     sem_t * semaphore_acteurs;      /**<- Sémaphore. */
-    limite_t * limite;            /**<- Limite. */
+    limite_t * limite;              /**<- Limite. */
     unsigned int numero;            /**<- Numéro de l'acteur. */
 } infos_t;
 

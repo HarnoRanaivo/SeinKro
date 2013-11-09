@@ -10,7 +10,7 @@
 /**
  * \brief Taille d'un tampon.
  */
-#define TAILLE_TAMPON 10
+#define TAILLE_TAMPON_DEFAUT 10
 
 /**
  * \brief Valeur de fin de production.
@@ -35,14 +35,15 @@ typedef struct tampon_t
     int curseur;                    /**<- Indice de la prochaine position où écrire. */
     int suivant;                    /**<- Indice de la prochaine position à lire. */
     sem_t * semaphore;              /**<- Sémaphore du tampon. */
-    int valeurs[TAILLE_TAMPON];     /**<- Contenu du tampon. */
+    int * valeurs;                  /**<- Contenu du tampon. */
+    const int taille;               /**<- Taille du tampon. */
 } tampon_t;
 
 /**
  * \brief Créer un tampon.
  * \return tampon
  */
-tampon_t * creer_tampon();
+tampon_t * creer_tampon(int taille);
 
 /**
  * \brief Détruire un tampon.
