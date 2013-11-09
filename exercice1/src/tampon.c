@@ -1,10 +1,14 @@
+/**
+ * \file tampon.c
+ * \brief Tampon (code)
+ */
 #include "tampon.h"
 
 tampon_t * creer_tampon()
 {
     tampon_t * t = malloc(sizeof *t);
     if (t == NULL)
-        pq_error("malloc", EX_OSERR);
+        aq_erreur("malloc", EX_OSERR);
 
     t->curseur = 0;
     t->suivant = 0;
@@ -13,10 +17,11 @@ tampon_t * creer_tampon()
     return t;
 }
 
-void detruire_tampon(tampon_t * tampon)
+tampon_t * detruire_tampon(tampon_t * tampon)
 {
     detruire_semaphore(tampon->semaphore);
     free(tampon);
+    return NULL;
 }
 
 int lire_entier(tampon_t * tampon)

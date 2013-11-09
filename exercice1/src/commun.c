@@ -1,4 +1,8 @@
-#include "common.h"
+/**
+ * \file commun.c
+ * \brief Fonctions communes (code)
+ */
+#include "commun.h"
 
 void masquer_signal(int signum)
 {
@@ -8,7 +12,7 @@ void masquer_signal(int signum)
     int error = pthread_sigmask(SIG_SETMASK, &mask, NULL);
 
     if (error != 0)
-        pq_error("pthread_sigmask", EX_OSERR);
+        aq_erreur("pthread_sigmask", EX_OSERR);
 }
 
 void config_handler(int signum, void (*handler)(int))
@@ -21,40 +25,28 @@ void config_handler(int signum, void (*handler)(int))
     int error = sigaction(signum, &action, NULL);
 
     if (error != 0)
-        pq_error("sigaction", EX_OSERR);
+        aq_erreur("sigaction", EX_OSERR);
 }
 
 sem_t * creer_semaphore(int valeur)
 {
     sem_t * s = malloc(sizeof *s);
     if (s == NULL)
-        pq_error("malloc", EX_OSERR);
+        aq_erreur("malloc", EX_OSERR);
 
     int erreur = sem_init(s, 0, valeur);
     if (erreur != 0)
-        pq_error("sem_init", EX_OSERR);
+        aq_erreur("sem_init", EX_OSERR);
 
     return s;
 }
 
-void detruire_semaphore(sem_t * semaphore)
+sem_t * detruire_semaphore(sem_t * semaphore)
 {
     int erreur = sem_destroy(semaphore);
-
     if (erreur != 0)
-        pq_error("sem_destroy", EX_OSERR);
+        aq_erreur("sem_destroy", EX_OSERR);
 
     free(semaphore);
-}
-
-comptes_t * creer_comptes()
-{
-    comptes_t * c = malloc(sizeof *c);
-    if (c == NULL)
-        pq_error("malloc", EX_OSERR);
-
-    c->nombre = 0;
-    c->somme = 0;
-
-    return c;
+    return NULL;
 }
