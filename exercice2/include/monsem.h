@@ -5,13 +5,15 @@
 #ifndef __MONSEM_H
 #define __MONSEM_H
 
-#include "stdlib.h"
-#include "stdio.h"
-#include "pthread.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <pthread.h>
 
 typedef struct monsem_t
 {
-    int dummy;
+    pthread_cond_t condition;
+    pthread_mutex_t mutex;
+    int valeur;
 } monsem_t;
 
 /**

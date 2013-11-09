@@ -11,8 +11,19 @@ vpath %.c $(SPATH)/
 vpath %.h $(IPATH)/
 vpath %.o $(OPATH)/
 
+all : main monsem_test
+
 main : main.o commun.o societe.o tampon.o limite.o | bin
 	$(CC) $(CFLAGS) -o $(BPATH)/$@ $(OPATH)/main.o $(OPATH)/commun.o $(OPATH)/societe.o $(OPATH)/tampon.o $(OPATH)/limite.o
+
+monsem_test : monsem_test_on.o monsem_test_off.o monsem.o | bin
+	$(CC) $(CFLAGS) -o $(BPATH)/$@_on $(OPATH)/monsem.o $(OPATH)/monsem_test_on.o
+	$(CC) $(CFLAGS) -o $(BPATH)/$@_off $(OPATH)/monsem.o $(OPATH)/monsem_test_off.o
+
+monsem_test_on.o : monsem_test.c monsem.h | obj
+	gcc $(CFLAGS) -D _TEST_MONSEM -o $(OPATH)/$@ -c $< $(IFLAGS)
+monsem_test_off.o : monsem_test.c monsem.h | obj
+	gcc $(CFLAGS) -U _TEST_MONSEM -o $(OPATH)/$@ -c $< $(IFLAGS)
 
 %.o : %.c | obj
 	gcc $(CFLAGS) -o $(OPATH)/$@ -c $< $(IFLAGS)
