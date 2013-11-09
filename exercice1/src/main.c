@@ -56,9 +56,9 @@ int main(int argc, char ** argv)
             comptes_consommation.nombre, comptes_consommation.somme);
 
     tampon = detruire_tampon(tampon);
+    limite = detruire_limite(limite);
     producteurs = detruire_acteurs(producteurs);
     consommateurs = detruire_acteurs(consommateurs);
-    limite = detruire_limite(limite);
 
     return 0;
 }

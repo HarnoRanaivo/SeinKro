@@ -46,9 +46,10 @@ acteurs_t * detruire_acteurs(acteurs_t * acteurs)
 {
     acteurs->semaphore = detruire_semaphore(acteurs->semaphore);
     free(acteurs->threads);
-    free(acteurs->semaphore);
+    free(acteurs);
     return NULL;
 }
+
 comptes_t bilan (const acteurs_t * acteurs)
 {
     comptes_t resultat;
