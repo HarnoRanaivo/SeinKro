@@ -42,3 +42,10 @@ int monsem_getvalue(monsem_t * semaphore, int * valeur)
 
     return 0;
 }
+
+int monsem_destroy(monsem_t * semaphore)
+{
+    pthread_cond_destroy(&semaphore->condition);
+    pthread_mutex_destroy(&semaphore->mutex);
+    return 0;
+}

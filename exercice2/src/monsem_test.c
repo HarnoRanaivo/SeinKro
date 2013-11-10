@@ -52,5 +52,7 @@ int main(int argc, char ** argv)
     printf("\tValeur attendue : %d\n\tValeur obtenue : %d\n",
             NOMBRE_THREADS * NOMBRE_INCREMENTATIONS, valeur);
 
+    monsem_destroy(&semaphore);
+
     return 0;
 }
