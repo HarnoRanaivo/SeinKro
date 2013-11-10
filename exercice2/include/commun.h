@@ -11,6 +11,7 @@
 #include <pthread.h>
 #include <signal.h>
 #include <semaphore.h>
+#include <errno.h>
 
 /**
  * \brief Afficher un message d'erreur et quitter.

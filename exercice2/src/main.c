@@ -7,8 +7,12 @@ static limite_t * limite;
 
 static void handler_sigint(int signum)
 {
+    /* Il vaut mieux sauvegarder errno dans les handler... */
+    int ancien_errno = errno;
+
     printf("\n");
     fin_des_temps(limite);
+    errno = ancien_errno;
 }
 
 static void verifier_arguments(int argc, char ** argv)
