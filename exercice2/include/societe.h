@@ -84,12 +84,12 @@ acteurs_t * detruire_acteurs(acteurs_t * acteurs);
  * \brief Fonction des producteurs.
  * \param arg Arguments passés au thread.
  */
-void * production(void * arg);
+void * produire(void * arg);
 
 /**
  * \brief Fonction des consommateurs.
  * \param arg Arguments passés au thread.
  */
-void * consommation(void * arg);
+void * consommer(void * arg);
 
 #endif /* __SOCIETE_H */

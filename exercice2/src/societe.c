@@ -80,7 +80,7 @@ comptes_t * creer_comptes()
     return c;
 }
 
-void * production(void * arg)
+void * produire(void * arg)
 {
     infos_t * i = (infos_t *) arg;
     comptes_t * comptes = creer_comptes();
@@ -104,7 +104,7 @@ void * production(void * arg)
     pthread_exit(comptes);
 }
 
-void * consommation(void * arg)
+void * consommer(void * arg)
 {
     infos_t * i = (infos_t *) arg;
     comptes_t * comptes = creer_comptes();
