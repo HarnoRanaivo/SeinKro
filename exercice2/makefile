@@ -16,14 +16,17 @@ all : main monsem_test
 main : main.o commun.o societe.o tampon.o limite.o monsem.o | bin
 	$(CC) $(CFLAGS) -o $(BPATH)/$@ $(OPATH)/main.o $(OPATH)/commun.o $(OPATH)/societe.o $(OPATH)/tampon.o $(OPATH)/limite.o $(OPATH)/monsem.o
 
-monsem_test : monsem_test_on.o monsem_test_off.o monsem.o | bin
-	$(CC) $(CFLAGS) -o $(BPATH)/$@_on $(OPATH)/monsem.o $(OPATH)/monsem_test_on.o
+monsem_test : monsem_test_binaire.o monsem_test_bloquant.o monsem_test_off.o monsem.o | bin
+	$(CC) $(CFLAGS) -o $(BPATH)/$@_binaire $(OPATH)/monsem.o $(OPATH)/monsem_test_binaire.o
+	$(CC) $(CFLAGS) -o $(BPATH)/$@_bloquant $(OPATH)/monsem.o $(OPATH)/monsem_test_bloquant.o
 	$(CC) $(CFLAGS) -o $(BPATH)/$@_off $(OPATH)/monsem.o $(OPATH)/monsem_test_off.o
 
-monsem_test_on.o : monsem_test.c monsem.h | obj
-	gcc $(CFLAGS) -D _TEST_MONSEM -o $(OPATH)/$@ -c $< $(IFLAGS)
+monsem_test_binaire.o : monsem_test.c monsem.h | obj
+	gcc $(CFLAGS) -D _TEST_MONSEM_BINAIRE -U _TEST_MONSEM_BLOQUANT -o $(OPATH)/$@ -c $< $(IFLAGS)
+monsem_test_bloquant.o : monsem_test.c monsem.h | obj
+	gcc $(CFLAGS) -U _TEST_MONSEM_BINAIRE -D _TEST_MONSEM_BLOQUANT -o $(OPATH)/$@ -c $< $(IFLAGS)
 monsem_test_off.o : monsem_test.c monsem.h | obj
-	gcc $(CFLAGS) -U _TEST_MONSEM -o $(OPATH)/$@ -c $< $(IFLAGS)
+	gcc $(CFLAGS) -U _TEST_MONSEM_BLOQUANT -U _TEST_MONSEM_BINAIRE -o $(OPATH)/$@ -c $< $(IFLAGS)
 
 %.o : %.c | obj
 	gcc $(CFLAGS) -o $(OPATH)/$@ -c $< $(IFLAGS)
