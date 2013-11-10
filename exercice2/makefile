@@ -13,8 +13,8 @@ vpath %.o $(OPATH)/
 
 all : main monsem_test
 
-main : main.o commun.o societe.o tampon.o limite.o | bin
-	$(CC) $(CFLAGS) -o $(BPATH)/$@ $(OPATH)/main.o $(OPATH)/commun.o $(OPATH)/societe.o $(OPATH)/tampon.o $(OPATH)/limite.o
+main : main.o commun.o societe.o tampon.o limite.o monsem.o | bin
+	$(CC) $(CFLAGS) -o $(BPATH)/$@ $(OPATH)/main.o $(OPATH)/commun.o $(OPATH)/societe.o $(OPATH)/tampon.o $(OPATH)/limite.o $(OPATH)/monsem.o
 
 monsem_test : monsem_test_on.o monsem_test_off.o monsem.o | bin
 	$(CC) $(CFLAGS) -o $(BPATH)/$@_on $(OPATH)/monsem.o $(OPATH)/monsem_test_on.o

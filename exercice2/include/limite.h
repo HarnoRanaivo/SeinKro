@@ -18,7 +18,7 @@ typedef enum etat_limite_t
 typedef struct limite_t
 {
     etat_limite_t etat;     /**<- État de la limite. */
-    sem_t * semaphore;      /**<- Sémaphore de la limite. */
+    monsem_t * semaphore;      /**<- Sémaphore de la limite. */
 } limite_t;
 
 /**
