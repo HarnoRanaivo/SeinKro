@@ -1,3 +1,7 @@
+/**
+ * \file limite.h
+ * \brief Limite (header)
+ */
 #ifndef __LIMITE_H
 #define __LIMITE_H
 

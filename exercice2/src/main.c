@@ -1,3 +1,7 @@
+/**
+ * \file main.c
+ * \brief Main
+ */
 #include "commun.h"
 #include "limite.h"
 #include "societe.h"

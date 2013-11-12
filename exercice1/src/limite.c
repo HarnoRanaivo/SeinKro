@@ -1,3 +1,7 @@
+/**
+ * \file limite.h
+ * \brief Limite (code)
+ */
 #include "limite.h"
 
 limite_t * creer_limite()

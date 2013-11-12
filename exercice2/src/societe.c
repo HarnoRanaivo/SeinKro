@@ -1,3 +1,7 @@
+/**
+ * \file societe.c
+ * \brief Société de consommation (code)
+ */
 #include "societe.h"
 
 infos_t * creer_infos(tampon_t * tampon, monsem_t * semaphore_acteurs, limite_t * limite, unsigned int numero)

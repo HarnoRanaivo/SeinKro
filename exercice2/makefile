@@ -6,6 +6,7 @@ SPATH = src
 OPATH = obj
 BPATH = bin
 IPATH = include
+DPATH = doc
 
 vpath %.c $(SPATH)/
 vpath %.h $(IPATH)/
@@ -43,9 +44,18 @@ obj :
 
 bin :
 	@mkdir -p $(BPATH)
+	
+doc :
+	doxygen
 
 clean :
 	@rm -rf $(OPATH) $(BPATH)
+	
+cleandoc :
+	@rm -rf $(DPATH)
+	
+cleanall : clean cleandoc
+	@echo "Everything cleaned up"
 
 archive :
-	tar -cvzf $(shell basename `pwd`).tar.gz src include makefile
+	tar -cvzf $(shell basename `pwd`).tar.gz src include makefile Doxyfile
