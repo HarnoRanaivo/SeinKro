@@ -16,3 +16,8 @@
 *.exe
 *.out
 *.app
+
+# Dirs
+bin/
+doc/
+obj/
