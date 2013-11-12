@@ -44,7 +44,7 @@ tampon_t * detruire_tampon(tampon_t * tampon)
 
 int lire_entier(tampon_t * tampon)
 {
-    sem_wait(tampon->semaphore);
+    monsem_wait(tampon->semaphore);
 
     int debut = tampon->suivant;
     int fin = tampon->curseur;
@@ -62,14 +62,14 @@ int lire_entier(tampon_t * tampon)
         }
     }
 
-    sem_post(tampon->semaphore);
+    monsem_post(tampon->semaphore);
 
     return valeur;
 }
 
 int ecrire_entier(tampon_t * tampon, int valeur)
 {
-    sem_wait(tampon->semaphore);
+    monsem_wait(tampon->semaphore);
 
     int fin = tampon->curseur;
     int retour = 0;
@@ -86,14 +86,14 @@ int ecrire_entier(tampon_t * tampon, int valeur)
     else
         retour = TAMPON_REMPLI;
 
-    sem_post(tampon->semaphore);
+    monsem_post(tampon->semaphore);
 
     return retour;
 }
 
 void fin_production(tampon_t * tampon)
 {
-    sem_wait(tampon->semaphore);
+    monsem_wait(tampon->semaphore);
     tampon->valeurs[tampon->suivant] = FIN_PRODUCTION;
-    sem_post(tampon->semaphore);
+    monsem_post(tampon->semaphore);
 }

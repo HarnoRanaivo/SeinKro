@@ -32,7 +32,7 @@ typedef struct acteurs_t
 {
     pthread_t * threads;    /**<- Threads des acteurs. */
     const int nombre;       /**<- Nombre d'acteurs. */
-    sem_t * semaphore;      /**<- Sémaphore des acteurs. */
+    monsem_t * semaphore;      /**<- Sémaphore des acteurs. */
 } acteurs_t;
 
 /**
@@ -41,7 +41,7 @@ typedef struct acteurs_t
 typedef struct infos_t
 {
     tampon_t * tampon;              /**<- Tampon utilisé. */
-    sem_t * semaphore_acteurs;      /**<- Sémaphore. */
+    monsem_t * semaphore_acteurs;      /**<- Sémaphore. */
     limite_t * limite;              /**<- Limite. */
     unsigned int numero;            /**<- Numéro de l'acteur. */
 } infos_t;
@@ -54,7 +54,7 @@ typedef struct infos_t
  * \param numero Numéro.
  * \return infos.
  */
-infos_t * creer_infos(tampon_t * tampon, sem_t * semaphore_acteurs, limite_t * limite, unsigned int numero);
+infos_t * creer_infos(tampon_t * tampon, monsem_t * semaphore_acteurs, limite_t * limite, unsigned int numero);
 
 /**
  * \brief Créer comptes.
@@ -91,12 +91,12 @@ acteurs_t * detruire_acteurs(acteurs_t * acteurs);
  * \brief Fonction des producteurs.
  * \param arg Arguments passés au thread.
  */
-void * production(void * arg);
+void * produire(void * arg);
 
 /**
  * \brief Fonction des consommateurs.
  * \param arg Arguments passés au thread.
  */
-void * consommation(void * arg);
+void * consommer(void * arg);
 
 #endif /* __SOCIETE_H */

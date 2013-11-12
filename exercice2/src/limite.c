@@ -1,5 +1,5 @@
 /**
- * \file limite.h
+ * \file limite.c
  * \brief Limite (code)
  * \author MEYER Jérémy, RAZANAJATO Harenome
  */
@@ -24,17 +24,17 @@ limite_t * creer_limite()
 
 int limite_atteinte(limite_t * limite)
 {
-    sem_wait(limite->semaphore);
+    monsem_wait(limite->semaphore);
     etat_limite_t etat = limite->etat;
-    sem_post(limite->semaphore);
+    monsem_post(limite->semaphore);
     return etat == FIN_DES_TEMPS;
 }
 
 void fin_des_temps(limite_t * limite)
 {
-    sem_wait(limite->semaphore);
+    monsem_wait(limite->semaphore);
     limite->etat = FIN_DES_TEMPS;
-    sem_post(limite->semaphore);
+    monsem_post(limite->semaphore);
 }
 
 limite_t * detruire_limite(limite_t * limite)

@@ -35,25 +35,20 @@ void config_handler(int signum, void (*handler)(int))
         aq_erreur("sigaction", EX_OSERR);
 }
 
-sem_t * creer_semaphore(int valeur)
+monsem_t * creer_semaphore(int valeur)
 {
-    sem_t * s = malloc(sizeof *s);
-    if (s == NULL)
+    monsem_t * semaphore = malloc(sizeof *semaphore);
+    if (semaphore == NULL)
         aq_erreur("malloc", EX_OSERR);
 
-    int erreur = sem_init(s, 0, valeur);
-    if (erreur != 0)
-        aq_erreur("sem_init", EX_OSERR);
+    monsem_init(semaphore, valeur);
 
-    return s;
+    return semaphore;
 }
 
-sem_t * detruire_semaphore(sem_t * semaphore)
+monsem_t * detruire_semaphore(monsem_t * semaphore)
 {
-    int erreur = sem_destroy(semaphore);
-    if (erreur != 0)
-        aq_erreur("sem_destroy", EX_OSERR);
-
+    monsem_destroy(semaphore);
     free(semaphore);
     return NULL;
 }

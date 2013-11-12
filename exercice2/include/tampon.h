@@ -41,7 +41,7 @@ typedef struct tampon_t
 {
     int curseur;                    /**<- Indice de la prochaine position où écrire. */
     int suivant;                    /**<- Indice de la prochaine position à lire. */
-    sem_t * semaphore;              /**<- Sémaphore du tampon. */
+    monsem_t * semaphore;              /**<- Sémaphore du tampon. */
     int * valeurs;                  /**<- Contenu du tampon. */
     const int taille;               /**<- Taille du tampon. */
 } tampon_t;

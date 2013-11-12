@@ -17,7 +17,9 @@
 #include <sysexits.h>
 #include <pthread.h>
 #include <signal.h>
-#include <semaphore.h>
+#include <errno.h>
+
+#include "monsem.h"
 
 /**
  * \brief Afficher un message d'erreur et quitter.
@@ -60,12 +62,12 @@ void config_handler(int signum, void (* handler) (int));
  * \param valeur Valeur initiale du sémaphore.
  * \return Sémaphore créé.
  */
-sem_t * creer_semaphore(int valeur);
+monsem_t * creer_semaphore(int valeur);
 
 /**
  * \brief Détruire un sémaphore.
  * \return NULL
  */
-sem_t * detruire_semaphore(sem_t * semaphore);
+monsem_t * detruire_semaphore(monsem_t * semaphore);
 
 #endif /* __COMMUN_H */

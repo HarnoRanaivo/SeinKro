@@ -11,7 +11,7 @@
  */
 #include "societe.h"
 
-infos_t * creer_infos(tampon_t * tampon, sem_t * semaphore_acteurs, limite_t * limite, unsigned int numero)
+infos_t * creer_infos(tampon_t * tampon, monsem_t * semaphore_acteurs, limite_t * limite, unsigned int numero)
 {
     infos_t * i = malloc(sizeof *i);
 
@@ -91,14 +91,14 @@ comptes_t * creer_comptes()
     return c;
 }
 
-void * production(void * arg)
+void * produire(void * arg)
 {
     infos_t * i = (infos_t *) arg;
     comptes_t * comptes = creer_comptes();
 
     while (! limite_atteinte(i->limite))
     {
-        sem_wait(i->semaphore_acteurs);
+        monsem_wait(i->semaphore_acteurs);
         int valeur = nombre_aleatoire(&i->numero);
         int retour = ecrire_entier(i->tampon, valeur);
         if (retour != TAMPON_REMPLI)
@@ -106,7 +106,7 @@ void * production(void * arg)
             comptes->nombre++;
             comptes->somme += valeur;
         }
-        sem_post(i->semaphore_acteurs);
+        monsem_post(i->semaphore_acteurs);
     }
     fin_production(i->tampon);
 
@@ -115,7 +115,7 @@ void * production(void * arg)
     pthread_exit(comptes);
 }
 
-void * consommation(void * arg)
+void * consommer(void * arg)
 {
     infos_t * i = (infos_t *) arg;
     comptes_t * comptes = creer_comptes();
@@ -123,14 +123,14 @@ void * consommation(void * arg)
 
     while (lecture != FIN_PRODUCTION)
     {
-        sem_wait(i->semaphore_acteurs);
+        monsem_wait(i->semaphore_acteurs);
         lecture = lire_entier(i->tampon);
         if (lecture != TAMPON_VIDE && lecture != FIN_PRODUCTION)
         {
             comptes->nombre++;
             comptes->somme += lecture;
         }
-        sem_post(i->semaphore_acteurs);
+        monsem_post(i->semaphore_acteurs);
     }
     free(arg);
 
